@@ -1,0 +1,29 @@
+{
+	"name": "typo3/cms-event-sourcing",
+	"type": "typo3-cms-framework",
+	"description": "TYPO3 Event Sourcing",
+	"homepage": "https://typo3.org",
+	"license": ["GPL-2.0+"],
+	"authors": [
+		{
+			"name": "Oliver Hader",
+			"email": "oliver@typo3.org"
+		}
+	],
+	"minimum-stability": "dev",
+	"require": {
+		"php" : "^7.0",
+		"ramsey/uuid": "~3.5",
+		"dbellettini/eventstore-client": "0.9.0 as e871a3ea61aa22256f65db36a0aaf7b02e60b0b6",
+		"league/tactician": "^1.0"
+	},
+	"replace": {
+		"event_sourcing": "*"
+	},
+	"autoload": {
+		"psr-4": {
+			"TYPO3\\CMS\\EventSourcing\\": "Classes/",
+			"TYPO3\\CMS\\EventSourcing\\Tests\\": "Tests/"
+		}
+	}
+}

@@ -14,7 +14,7 @@
 	"require": {
 		"php" : "^7.0",
 		"ramsey/uuid": "~3.5",
-		"dbellettini/eventstore-client": "0.9.0 as e871a3ea61aa22256f65db36a0aaf7b02e60b0b6",
+		"dbellettini/eventstore-client": "dev-master",
 		"league/tactician": "^1.0"
 	},
 	"replace": {

@@ -16,8 +16,8 @@ namespace TYPO3\CMS\EventSourcing\Tests\Functional\Infrastructure\EventStore;
 
 use Ramsey\Uuid\Uuid;
 use TYPO3\CMS\Core\Tests\FunctionalTestCase;
-use TYPO3\CMS\EventSourcing\DataHandling\Infrastructure\EventStore\Driver\GetEventStoreDriver;
-use TYPO3\CMS\EventSourcing\DataHandling\Infrastructure\EventStore\EventStore;
+use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\Driver\GetEventStoreDriver;
+use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\EventStore;
 use TYPO3\CMS\EventSourcing\Tests\Framework\PerformanceMessageException;
 use TYPO3\CMS\EventSourcing\Tests\Framework\PerformanceTest;
 use TYPO3\CMS\EventSourcing\Tests\Functional\Infrastructure\EventStore\Fixtures\EventFixture;

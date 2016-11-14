@@ -1,5 +1,5 @@
 <?php
-namespace TYPO3\CMS\EventSourcing\DataHandling\Infrastructure\Domain\Model\Base;
+namespace TYPO3\CMS\EventSourcing\Infrastructure\Domain\Model\Base;
 
 /*
  * This file is part of the TYPO3 CMS project.

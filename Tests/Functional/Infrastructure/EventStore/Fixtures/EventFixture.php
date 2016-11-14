@@ -14,10 +14,12 @@ namespace TYPO3\CMS\EventSourcing\Tests\Functional\Infrastructure\EventStore\Fix
  * The TYPO3 project - inspiring people to share!
  */
 
+use TYPO3\CMS\EventSourcing\Core\Domain\Model\Base\Event\StorableEvent;
+
 /**
  * Event fixture for performance tests.
  */
-class EventFixture extends AbstractEventFixture
+class EventFixture extends AbstractEventFixture implements StorableEvent
 {
     /**
      * @param int $value

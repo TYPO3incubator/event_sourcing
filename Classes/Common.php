@@ -14,13 +14,23 @@ namespace TYPO3\CMS\EventSourcing;
  * The TYPO3 project - inspiring people to share!
  */
 
-use TYPO3\CMS\EventSourcing\DataHandling\Infrastructure\EventStore\Driver\GetEventStoreDriver;
-use TYPO3\CMS\EventSourcing\DataHandling\Infrastructure\EventStore\Driver\SqlDriver;
-use TYPO3\CMS\EventSourcing\DataHandling\Infrastructure\EventStore\EventStore;
-use TYPO3\CMS\EventSourcing\DataHandling\Infrastructure\EventStore\EventStorePool;
+use TYPO3\CMS\EventSourcing\Core\Database\ConnectionPool;
+use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\Driver\GetEventStoreDriver;
+use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\Driver\SqlDriver;
+use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\EventStore;
+use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\EventStorePool;
 
 class Common
 {
+    /**
+     * Overrides global configuration.
+     */
+    public static function overrideConfiguration()
+    {
+        $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections'][ConnectionPool::ORIGIN_CONNECTION_NAME] =
+            $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections'][ConnectionPool::DEFAULT_CONNECTION_NAME];
+    }
+
     public static function registerEventSources()
     {
         // initialize default EventStore using SqlDriver

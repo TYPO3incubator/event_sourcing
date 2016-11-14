@@ -1,5 +1,5 @@
 <?php
-namespace TYPO3\CMS\EventSourcing\DataHandling\Infrastructure\EventStore;
+namespace TYPO3\CMS\EventSourcing\Infrastructure\EventStore;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -15,7 +15,7 @@ namespace TYPO3\CMS\EventSourcing\DataHandling\Infrastructure\EventStore;
  */
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\EventSourcing\DataHandling\Infrastructure\EventStore\Driver\EventTraversable;
+use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\Driver\EventTraversable;
 
 class EventStream extends \IteratorIterator
 {

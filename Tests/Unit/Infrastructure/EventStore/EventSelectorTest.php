@@ -16,7 +16,7 @@ namespace TYPO3\CMS\EventSourcing\Tests\Unit\Infrastructure\EventStore;
 
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 use TYPO3\CMS\EventSourcing\Core\Domain\Model\Base\Event;
-use TYPO3\CMS\EventSourcing\DataHandling\Infrastructure\EventStore\EventSelector;
+use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\EventSelector;
 use TYPO3\CMS\EventSourcing\Tests\Framework\AssertionUtility;
 use TYPO3\CMS\EventSourcing\Tests\Functional\Infrastructure\EventStore\Fixtures;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;

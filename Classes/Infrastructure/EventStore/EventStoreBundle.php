@@ -1,5 +1,5 @@
 <?php
-namespace TYPO3\CMS\EventSourcing\DataHandling\Infrastructure\EventStore;
+namespace TYPO3\CMS\EventSourcing\Infrastructure\EventStore;
 
 /*
  * This file is part of the TYPO3 CMS project.

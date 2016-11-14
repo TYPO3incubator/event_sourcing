@@ -1,5 +1,5 @@
 <?php
-namespace TYPO3\CMS\EventSourcing\DataHandling\Infrastructure\EventStore\Driver;
+namespace TYPO3\CMS\EventSourcing\Infrastructure\EventStore\Driver;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -17,8 +17,8 @@ namespace TYPO3\CMS\EventSourcing\DataHandling\Infrastructure\EventStore\Driver;
 use EventStore\ValueObjects\Identity\UUID as GetEventStoreUUID;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\EventSourcing\Core\Domain\Model\Base\Event\BaseEvent;
-use TYPO3\CMS\EventSourcing\DataHandling\Infrastructure\EventStore\EventSelector;
-use TYPO3\CMS\EventSourcing\DataHandling\Infrastructure\EventStore\EventStream;
+use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\EventSelector;
+use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\EventStream;
 
 class GetEventStoreDriver implements PersistableDriver
 {

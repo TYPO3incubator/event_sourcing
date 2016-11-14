@@ -17,10 +17,8 @@ namespace TYPO3\CMS\EventSourcing\Core\Database;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\EventSourcing\Core\Compatibility\Database\ConnectionInterceptor;
 use TYPO3\CMS\EventSourcing\Core\Domain\Model\Meta\EventSourcingMap;
 use TYPO3\CMS\EventSourcing\Core\Service\DatabaseService;
-use TYPO3\CMS\EventSourcing\Core\Service\FileSystemService;
 
 /**
  * Extends to regular connection pool by intercepting the default
@@ -86,15 +84,15 @@ class ConnectionPool extends \TYPO3\CMS\Core\Database\ConnectionPool
      */
     public function getConnectionForTable(string $tableName): Connection
     {
-        // use local stroage for
-        // + tables that shall be projected
-        // + tables that belong to caching framework
-        $useLocalStorage = (
-            EventSourcingMap::provide()->shallProject($tableName)
-            || DatabaseService::instance()->isCacheTable($tableName)
+        // use origin for
+        // + tables that shall not be projected
+        // + tables that do not belong to caching framework
+        $useOriginConnection = (
+            !EventSourcingMap::provide()->shallProject($tableName)
+            && !DatabaseService::instance()->isCacheTable($tableName)
         );
 
-        if (!$useLocalStorage) {
+        if ($useOriginConnection) {
             return $this->getOriginConnection();
         }
 
@@ -142,82 +140,12 @@ class ConnectionPool extends \TYPO3\CMS\Core\Database\ConnectionPool
     }
 
     /**
-     * Provides a local storage connection for context based projections.
+     * Defines a particular connection to act as default connection.
      *
-     * @param string $name Name of the LocalStorage (e.g. 'workspace-0')
-     * @param bool $write Whether to allow write access (e.g. for projection)
-     * @return Connection
+     * @param string $defaultConnectionName
      */
-    public function provideLocalStorageConnection(string $name, bool $write = false)
+    public function setDefaultConnectionName(string $defaultConnectionName)
     {
-        $connectionName = $this->getLocalStorageName($name, $write);
-
-        if (!isset($GLOBALS['TYPO3_CONF_VARS']['DB']['Connections'][$connectionName])) {
-            $filePath = GeneralUtility::getFileAbsFileName(
-                'typo3temp/var/LocalStorage/' . $name . '.sqlite'
-            );
-            FileSystemService::instance()->ensureHtAccessDenyFile(
-                dirname($filePath)
-            );
-
-            $connectionConfiguration = [
-                'driver' => 'pdo_sqlite',
-                'path' => $filePath,
-                'memory' => false,
-            ];
-            if (!$write) {
-                $connectionConfiguration['wrapperClass']= ConnectionInterceptor::class;
-            }
-            $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections'][$connectionName] = $connectionConfiguration;
-
-            if (!file_exists($filePath)) {
-                $this->reinitializeLocalStorage($name);
-                GeneralUtility::fixPermissions(dirname($filePath));
-                GeneralUtility::fixPermissions($filePath);
-            }
-        }
-
-        return $this->getConnectionByName($connectionName);
-    }
-
-    /**
-     * Defines a particular local storage as default connection.
-     *
-     * @param string $name
-     */
-    public function setLocalStorageAsDefault(string $name)
-    {
-        $connectionName = $this->getLocalStorageName($name);
-        $this->provideLocalStorageConnection($name);
-
-        static::map(static::DEFAULT_CONNECTION_NAME, $connectionName);
-    }
-
-    /**
-     * Reinitialize a particular local storage.
-     * (clears all tables and provides local SQLite storage)
-     *
-     * @param string $name
-     */
-    public function reinitializeLocalStorage(string $name)
-    {
-        $connectionName = $this->getLocalStorageName($name, true);
-        $this->provideLocalStorageConnection($name, true);
-
-        LocalStorage::instance()->purge($connectionName);
-        LocalStorage::instance()->initialize($connectionName);
-    }
-
-    /**
-     * Unifies the generation of a local storage name.
-     * This identifier is used a connection name as well.
-     *
-     * @param string $name
-     * @param bool $write
-     * @return string
-     */
-    private function getLocalStorageName(string $name, bool $write = false)
-    {
-        return 'LocalStorage::' . $name . ($write ? '::write' : '');
+        static::map(static::DEFAULT_CONNECTION_NAME, $defaultConnectionName);
     }
 }

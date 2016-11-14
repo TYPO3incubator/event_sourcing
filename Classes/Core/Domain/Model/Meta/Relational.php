@@ -1,5 +1,5 @@
 <?php
-namespace TYPO3\CMS\EventSourcing\Infrastructure\EventStore;
+namespace TYPO3\CMS\EventSourcing\Core\Domain\Model\Meta;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -14,15 +14,7 @@ namespace TYPO3\CMS\EventSourcing\Infrastructure\EventStore;
  * The TYPO3 project - inspiring people to share!
  */
 
-use TYPO3\CMS\EventSourcing\Core\Domain\Model\Base\Event\BaseEvent;
-
-interface AttachableStore
+interface Relational
 {
-    /**
-     * @param string $streamName
-     * @param BaseEvent $event
-     * @param string[] $categories
-     * @param null $expectedVersion
-     */
-    public function attach(string $streamName, BaseEvent $event, array $categories = [], $expectedVersion = null);
+    public function getProperty(): Property;
 }

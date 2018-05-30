@@ -28,17 +28,20 @@ class MetaModelService implements SingletonInterface
 
     public function shallListenEvents(string $tableName)
     {
-        return (bool)($GLOBALS['TCA'][$tableName]['ctrl']['eventSourcing']['listenEvents'] ?? false);
+        return (bool)($GLOBALS['TYPO3_CONF_VARS']['SYS']['eventSourcing']['listenAllEvents'] ?? false)
+            || (bool)($GLOBALS['TCA'][$tableName]['ctrl']['eventSourcing']['listenEvents'] ?? false);
     }
 
     public function shallRecordEvents(string $tableName)
     {
-        return (bool)($GLOBALS['TCA'][$tableName]['ctrl']['eventSourcing']['recordEvents'] ?? false);
+        return (bool)($GLOBALS['TYPO3_CONF_VARS']['SYS']['eventSourcing']['recordAllEvents'] ?? false)
+            || (bool)($GLOBALS['TCA'][$tableName]['ctrl']['eventSourcing']['recordEvents'] ?? false);
     }
 
     public function shallProjectEvents(string $tableName)
     {
-        return (bool)($GLOBALS['TCA'][$tableName]['ctrl']['eventSourcing']['projectEvents'] ?? false);
+        return (bool)($GLOBALS['TYPO3_CONF_VARS']['SYS']['eventSourcing']['projectAllEvents'] ?? false)
+            || (bool)($GLOBALS['TCA'][$tableName]['ctrl']['eventSourcing']['projectEvents'] ?? false);
     }
 
     public function isWorkspaceAware(string $tableName)

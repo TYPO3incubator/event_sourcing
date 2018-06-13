@@ -75,8 +75,8 @@ trait EventHandlerTrait
 
     protected function manageEvent(BaseEvent $event)
     {
-        $this->recordEvent($event);
         $this->applyEvent($event);
+        $this->recordEvent($event);
     }
 
     protected function recordEvent(BaseEvent $event)

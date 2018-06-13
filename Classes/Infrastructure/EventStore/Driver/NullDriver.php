@@ -16,6 +16,7 @@ namespace TYPO3\CMS\EventSourcing\Infrastructure\EventStore\Driver;
 
 use TYPO3\CMS\EventSourcing\Core\Domain\Model\Base\Event\BaseEvent;
 use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\EventStream;
+use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\Updatable;
 
 class NullDriver implements PersistableDriver
 {
@@ -38,6 +39,10 @@ class NullDriver implements PersistableDriver
         return true;
     }
 
+    public function attachUpdate(Updatable $update)
+    {
+    }
+
     /**
      * @param string $streamName
      * @param string[] $categories
@@ -45,7 +50,7 @@ class NullDriver implements PersistableDriver
      */
     public function stream(string $streamName, array $categories = [])
     {
-        return EventStream::create(NullDriverIterator::instance(), $streamName);
+        return EventStream::create(new NullDriverIterator(), $streamName);
     }
 
     /**

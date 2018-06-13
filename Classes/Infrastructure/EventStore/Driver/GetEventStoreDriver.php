@@ -19,6 +19,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\EventSourcing\Core\Domain\Model\Base\Event\BaseEvent;
 use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\EventSelector;
 use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\EventStream;
+use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\Updatable;
 
 class GetEventStoreDriver implements PersistableDriver
 {
@@ -45,6 +46,11 @@ class GetEventStoreDriver implements PersistableDriver
      * @var bool
      */
     protected $available = false;
+
+    /**
+     * @var Updatable[]
+     */
+    private $updates = [];
 
     /**
      * @param string $url
@@ -113,6 +119,13 @@ class GetEventStoreDriver implements PersistableDriver
         }
     }
 
+    public function attachUpdate(Updatable $update)
+    {
+        if (!in_array($update, $this->updates, true)) {
+            $this->updates[] = $update;
+        }
+    }
+
     /**
      * @param string $streamName
      * @param array $categories
@@ -127,7 +140,7 @@ class GetEventStoreDriver implements PersistableDriver
 
         if (!$this->available) {
             return EventStream::create(
-                NullDriverIterator::instance(),
+                new NullDriverIterator(),
                 $streamName
             );
         }
@@ -140,8 +153,9 @@ class GetEventStoreDriver implements PersistableDriver
             $comparableStreamName = rawurlencode('$all');
         }
 
-        $iterator = GetEventStoreIterator::create(
-            $this->eventStore->forwardStreamFeedIterator($comparableStreamName)
+        $iterator = new GetEventStoreIterator(
+            $this->eventStore->forwardStreamFeedIterator($comparableStreamName),
+            ...$this->updates
         );
 
         return EventStream::create($iterator, $streamName);

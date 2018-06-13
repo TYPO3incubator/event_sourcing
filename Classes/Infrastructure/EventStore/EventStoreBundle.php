@@ -44,4 +44,12 @@ class EventStoreBundle extends \ArrayObject implements AttachableStore
             $eventStore->attach($streamName, $event, $categories, $expectedVersion);
         }
     }
+
+    public function attachUpdate(Updatable $update)
+    {
+        /** @var EventStore $eventStore */
+        foreach ($this as $eventStore) {
+            $eventStore->attachUpdate($update);
+        }
+    }
 }

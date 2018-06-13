@@ -28,6 +28,11 @@ class EventStore implements AttachableStore
     private $driver;
 
     /**
+     * @var Updatable[]
+     */
+    private $updates = [];
+
+    /**
      * @param PersistableDriver $driver
      * @return EventStore
      */
@@ -61,6 +66,11 @@ class EventStore implements AttachableStore
         if ($eventVersion !== null) {
             $event->setEventVersion($eventVersion);
         }
+    }
+
+    public function attachUpdate(Updatable $update)
+    {
+        $this->driver->attachUpdate($update);
     }
 
     /**

@@ -20,10 +20,16 @@ use TYPO3\CMS\EventSourcing\Core\Database\ConnectionPool;
 use TYPO3\CMS\EventSourcing\Core\Domain\Model\Base\Event\BaseEvent;
 use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\EventSelector;
 use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\EventStream;
+use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\Updatable;
 
 class SqlDriver implements PersistableDriver
 {
     const FORMAT_DATETIME = 'Y-m-d H:i:s.u';
+
+    /**
+     * @var Updatable[]
+     */
+    private $updates = [];
 
     /**
      * @return SqlDriver
@@ -99,6 +105,13 @@ class SqlDriver implements PersistableDriver
         return $eventVersion;
     }
 
+    public function attachUpdate(Updatable $update)
+    {
+        if (!in_array($update, $this->updates, true)) {
+            $this->updates[] = $update;
+        }
+    }
+
     /**
      * @param string $streamName
      * @param array $categories
@@ -128,7 +141,10 @@ class SqlDriver implements PersistableDriver
             ->where(...$predicates)
             ->execute();
 
-        return EventStream::create(SqlDriverIterator::create($statement), $streamName);
+        return EventStream::create(
+            new SqlDriverIterator($statement, ...$this->updates),
+            $streamName
+        );
     }
 
     /**

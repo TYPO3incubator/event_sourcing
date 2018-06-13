@@ -15,6 +15,7 @@ namespace TYPO3\CMS\EventSourcing\Infrastructure\EventStore\Driver;
  */
 
 use TYPO3\CMS\EventSourcing\Core\Domain\Model\Base\Event\BaseEvent;
+use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\Updatable;
 
 interface PersistableDriver
 {
@@ -25,6 +26,12 @@ interface PersistableDriver
      * @return null|int
      */
     public function attach(string $streamName, BaseEvent $event, array $categories = []);
+
+    /**
+     * @param Updatable $update
+     * @return void
+     */
+    public function attachUpdate(Updatable $update);
 
     /**
      * @param string $streamName

@@ -16,11 +16,4 @@ namespace TYPO3\CMS\EventSourcing\Infrastructure\EventStore\Driver;
 
 class NullDriverIterator extends \ArrayObject implements EventTraversable
 {
-    /**
-     * @return NullDriverIterator
-     */
-    public static function instance()
-    {
-        return new static();
-    }
 }

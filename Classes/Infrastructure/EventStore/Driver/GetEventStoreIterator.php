@@ -18,6 +18,7 @@ use EventStore\StreamFeed\StreamFeedIterator;
 use Ramsey\Uuid\Uuid;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\EventSourcing\Core\Domain\Model\Base\Event\BaseEvent;
+use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\Updatable;
 
 class GetEventStoreIterator implements \Iterator, EventTraversable
 {
@@ -36,13 +37,19 @@ class GetEventStoreIterator implements \Iterator, EventTraversable
     protected $feedIterator;
 
     /**
+     * @var Updatable[]
+     */
+    private $updates;
+
+    /**
      * @var BaseEvent
      */
     protected $event;
 
-    public function __construct(StreamFeedIterator $feedIterator)
+    public function __construct(StreamFeedIterator $feedIterator, Updatable ...$updates)
     {
         $this->feedIterator = $feedIterator;
+        $this->updates = $updates;
     }
 
     /**
@@ -94,9 +101,6 @@ class GetEventStoreIterator implements \Iterator, EventTraversable
         $this->feedIterator->next();
 
         $eventClassName = $item->getEvent()->getType();
-        if (!is_a($eventClassName, BaseEvent::class, true)) {
-            return $this->invalidate();
-        }
 
         $entryData = $this->extractPrivateProperty($item->getEntry(), 'json');
         $eventDate = new \DateTime($entryData['updated']);
@@ -110,8 +114,25 @@ class GetEventStoreIterator implements \Iterator, EventTraversable
             unset($metadata['$aggregateId']);
         }
 
+        foreach ($this->updates as $update) {
+            if (in_array($eventClassName, $update->listensTo(), true)) {
+                $event = $update->update(
+                    $eventClassName,
+                    $item->getEvent()->getEventId()->toNative(),
+                    $item->getEvent()->getVersion(),
+                    $eventDate,
+                    $aggregateId,
+                    $data,
+                    $metadata
+                );
+                if ($event !== null) {
+                    break;
+                }
+            }
+        }
+
         /** @var BaseEvent $eventClassName */
-        $this->event = $eventClassName::reconstitute(
+        $event = $eventClassName::reconstitute(
             $item->getEvent()->getType(),
             $item->getEvent()->getEventId()->toNative(),
             $item->getEvent()->getVersion(),
@@ -121,6 +142,11 @@ class GetEventStoreIterator implements \Iterator, EventTraversable
             $metadata
         );
 
+        if (!$event instanceof BaseEvent) {
+            return $this->invalidate();
+        }
+
+        $this->event = $event;
         return true;
     }
 

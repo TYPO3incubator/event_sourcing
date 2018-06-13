@@ -18,6 +18,7 @@ use Doctrine\DBAL\Driver\Statement;
 use Ramsey\Uuid\Uuid;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\EventSourcing\Core\Domain\Model\Base\Event\BaseEvent;
+use TYPO3\CMS\EventSourcing\Infrastructure\EventStore\Updatable;
 
 class SqlDriverIterator implements \Iterator, EventTraversable
 {
@@ -40,9 +41,15 @@ class SqlDriverIterator implements \Iterator, EventTraversable
      */
     protected $event;
 
-    public function __construct(Statement $statement)
+    /**
+     * @var Updatable[]
+     */
+    private $updates;
+
+    public function __construct(Statement $statement, Updatable ...$updates)
     {
         $this->statement = $statement;
+        $this->updates = $updates;
         $this->reconstituteNext();
     }
 
@@ -91,9 +98,6 @@ class SqlDriverIterator implements \Iterator, EventTraversable
         }
 
         $eventClassName = $rawEvent['event_name'];
-        if (!is_a($eventClassName, BaseEvent::class, true)) {
-            return $this->invalidate();
-        }
 
         // @todo microsecond part is omitted if fetching from database
         $eventDate = new \DateTime($rawEvent['event_date']);
@@ -112,17 +116,41 @@ class SqlDriverIterator implements \Iterator, EventTraversable
             $metadata = json_decode($metadata, true);
         }
 
-        /** @var BaseEvent $eventClassName */
-        $this->event = $eventClassName::reconstitute(
-            $rawEvent['event_name'],
-            $rawEvent['event_id'],
-            $rawEvent['event_version'],
-            $eventDate,
-            $aggregateId,
-            $data,
-            $metadata
-        );
+        foreach ($this->updates as $update) {
+            if (in_array($eventClassName, $update->listensTo(), true)) {
+                $event = $update->update(
+                    $eventClassName,
+                    $rawEvent['event_id'],
+                    $rawEvent['event_version'],
+                    $eventDate,
+                    $aggregateId,
+                    $data,
+                    $metadata
+                );
+                if ($event !== null) {
+                    break;
+                }
+            }
+        }
 
+        if (empty($event)) {
+            /** @var BaseEvent $eventClassName */
+            $event = $eventClassName::reconstitute(
+                $eventClassName,
+                $rawEvent['event_id'],
+                $rawEvent['event_version'],
+                $eventDate,
+                $aggregateId,
+                $data,
+                $metadata
+            );
+        }
+
+        if (!$event instanceof BaseEvent) {
+            return $this->invalidate();
+        }
+
+        $this->event = $event;
         return true;
     }
 
